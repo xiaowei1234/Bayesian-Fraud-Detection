@@ -133,31 +133,10 @@ test_* - unittest code
 
 All code in "evaluation code" folder is code used to evaluate the effectiveness of the custom metrics
 
-### Implementation Notes
-
-Ruby should call fpd_query and cart_query and store the results in a csv file with a header row. If that is not possible, Python can do it instead but you will need the additional "PyMySQL" package.
-
-After SQL is finished executing fraud_analysis.py and cart_analysis.py should be run. These two files are independent of each other and can be run concurrently. Both scripts produce one csv file each. The csv files contain the relevant metrics by location_id. The filenames are all controlled by the constants.py file.
-
-
-
-Files in "platform" repository to edit/replace/delete:
-
-zed_helper.rb - I'm not sure this is needed
-
-zed_score_query.sql - replace this file with cart_query.sql and fpd_query.sql
-
-zed_score_spec.rb - edit this to integrate the new Python code
-
-zed.rake - the rake file
 
 ##### Additional implementation steps:
 
 In addition to replacing the two Z-Score columns and renaming them to "FPD Score" and "Cart Score" the dashboard should be changed to not display any transaction in locations where both of the new custom scores are < 7 (still use old behavior when either score is missing). This should cut down the number of manual review transactions by more than half.
-
-##### Bonus implementation step:
-
-It would also be great if the two custom scores are available in MySQL either in the "dashboard" database or the "billfloat_production" database, whichever is easier.
 
 ##### Future implementation possibility
 
