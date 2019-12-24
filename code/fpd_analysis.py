@@ -40,6 +40,9 @@ def remove_no_zero_score(df):
 
 
 def create_channel_debias(df_debias):
+    """
+    debias against the fact that model prediction is 2MP60 whereas we are using 2MP7. Also the model will naturally over/under predict over time
+    """
     df_debias['weighted_score'] = df_debias.avg_score * df_debias.num_matured
     g_df = df_debias.groupby('channel', as_index=False)[['fpd', 'weighted_score', 'num_matured']].sum()
     g_df['weighted_score'] = g_df['weighted_score'] / g_df.num_matured
@@ -49,6 +52,9 @@ def create_channel_debias(df_debias):
 
 
 def create_expectations(df):
+    """
+    expectation is the expected FPD rate given what the model predicts for each location within each channel
+    """
     df_debias = good_locations(df)
     g_df = create_channel_debias(df_debias)
     debias_df = df.merge(g_df[['channel', 'debias_factor']], on='channel', how='left')
@@ -64,6 +70,7 @@ def create_expectations(df):
 
 def create_fpd_variances(df):
     """
+    variance of fpd across locations within each channel
     """
     variance_df = (good_locations(df)[['channel', '2mp']]
                     .groupby('channel', as_index=False).var()
@@ -82,8 +89,10 @@ def main_fpd_pipes(csv_path):
     else:
         df = pd.read_csv(csv_path)
     df['2mp'] = df.fpd / df.num_matured
-    beta_df = (df.pipe(remove_no_zero_score)
-                .pipe(create_expectations)
+    clean_df = df.pipe(remove_no_zero_score)
+    if clean_df.shape[0] < 2:
+        return pd.DataFrame({'location_id': [], 'fpd_score': []})
+    beta_df = (clean_df.pipe(create_expectations)
                 .pipe(create_fpd_variances)
                 .pipe(stats.create_beta_priors)
                 .pipe(stats.create_beta_posteriors)

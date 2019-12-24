@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 import unittest
 from test_stats import float_equals
-from fpd_analysis import create_expectations, create_fpd_variances, remove_no_zero_score, create_channel_debias
+from fpd_analysis import create_expectations, create_fpd_variances, remove_no_zero_score, create_channel_debias, main_fpd_pipes
 
 
 
@@ -26,6 +26,7 @@ class TestFpdAnalysis(unittest.TestCase):
                                 })
         df['2mp'] = df.fpd / df.num_matured
         self.df = df
+        self.empty_df = pd.DataFrame({'channel': [], 'location_id': [], 'avg_score': [], 'fpd': [], 'num_matured': []})
 
     def test_remove_no_score(self):
         df = remove_no_zero_score(self.zeros_df)
@@ -53,3 +54,7 @@ class TestFpdAnalysis(unittest.TestCase):
         input_df = self.df.loc[self.df.channel.isin(['s', 'o', 'n']), :]
         df = create_fpd_variances(input_df)
         self.assertTrue(float_equals(np.mean(df.variance), df.variance.values[0]))
+    
+    def test_empty(self):
+        df = main_fpd_pipes(self.empty_df)
+        assert df.shape[0] == 0

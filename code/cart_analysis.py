@@ -12,15 +12,24 @@ import stats
 #%%
 
 def ttest_location(channel, location, df):
+    """
+    t test single location and compare against its channel
+    """
     channel_array = np.ravel(df.loc[channel])
     location_array = np.ravel(df.loc[location])
     return stats.ttest(location_array, channel_array)
 
 
+# vectorize ttest_location
 make_all_ttests = stats.vectorize(ttest_location, [2])
 
 
 def run_ttests(df):
+    """
+    get arrays of cart utilization rates for each distinct channel and location and then run t tests
+    """
+    if df.shape[0] == 0:
+        return pd.DataFrame({'location_id': [], 'cart_score': []})
     locations = df.index.drop_duplicates()
     channels = locations.get_level_values(0)
     pvals = make_all_ttests(channels, locations, df)
@@ -29,6 +38,9 @@ def run_ttests(df):
 
 
 def main_cart_pipes(csv_path):
+    """
+    coordinate pipes
+    """
     if isinstance(csv_path, pd.DataFrame):
         df = csv_path
     else:
