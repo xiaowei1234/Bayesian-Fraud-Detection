@@ -72,9 +72,11 @@ def create_fpd_variances(df):
     """
     variance of fpd across locations within each channel
     """
-    variance_df = (good_locations(df)[['channel', '2mp']]
+    good_df = good_locations(df)
+    good_df['diff'] = np.abs(good_df['expected'] - good_df['2mp'])
+    variance_df = (good_df[['channel', 'diff']]
                     .groupby('channel', as_index=False).var()
-                    .rename(columns={'2mp': 'variance'}))
+                    .rename(columns={'diff': 'variance'}))
     not_zero = variance_df.variance > 0
     low = variance_df.loc[not_zero, 'variance'].min()
     variance_df.loc[~not_zero, 'variance'] = low
@@ -102,6 +104,10 @@ def main_fpd_pipes(csv_path):
 
 
 #%%
+def main(input_data, output_path):
+    df = main_fpd_pipes(input_data)
+    df[['location_id', 'fpd_score']].to_csv(output_path, index=False)
+
+
 if __name__ == '__main__':
-    df = main_fpd_pipes(c.fpd_sql_data)
-    df[['location_id', 'fpd_score']].to_csv(c.fpd_output, index=False)
+    main(c.fpd_sql_data, c.fpd_output)

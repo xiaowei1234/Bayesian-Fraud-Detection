@@ -9,7 +9,7 @@ def create_beta_priors(df):
     calculates and returns dataframe with beta priors for each location
     df (pandas dataframe): dataframe with location_id, channel, variance, and expected columns
     """
-    df['alpha'] = np.maximum((1 - df.expected) * np.power(df.expected, 2) / df.variance - df.expected, 0.1)
+    df['alpha'] = np.minimum(np.maximum((1 - df.expected) * np.power(df.expected, 2) / df.variance - df.expected, 0.1), 15)
     df['beta'] = df.alpha / df.expected - df.alpha
     return df
 

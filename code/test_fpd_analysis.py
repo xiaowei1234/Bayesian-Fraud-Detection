@@ -23,6 +23,7 @@ class TestFpdAnalysis(unittest.TestCase):
                                 , 'fpd': [0, 2, 4, 0, 1, 2, 2, 2, 2, 0, 5]
                                 , 'num_matured': [2, 14, 12, 2, 4, 12, 32, 5, 23, 2, 6]
                                 , 'avg_score': [0.1, 0.13, 0.41, 0.04, 0.05, 0.12, 0.15, 0.07, 0.19, 0.4, 0.3]
+                                , 'expected': [0.1, 0.13, 0.41, 0.04, 0.05, 0.12, 0.15, 0.07, 0.19, 0.4, 0.3]
                                 })
         df['2mp'] = df.fpd / df.num_matured
         self.df = df

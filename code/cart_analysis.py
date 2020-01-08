@@ -50,6 +50,10 @@ def main_cart_pipes(csv_path):
     return p_df
 #%%
 
+def main(input_data, output_path):
+    p_df = main_cart_pipes(input_data)
+    p_df[['location_id', 'cart_score']].to_csv(output_path, index=False)
+
+
 if __name__ == '__main__':
-    p_df = main_cart_pipes(c.cart_sql_data)
-    p_df[['location_id', 'cart_score']].to_csv(c.cart_output, index=False)
+    main(c.cart_sql_data, c.cart_output)
